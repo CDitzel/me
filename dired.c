@@ -362,6 +362,8 @@ d_findfile(int f, int n)
 		bp = dired_(fname);
 	else
 		bp = findbuffer(fname);
+
+	orderbufferlist(bp);		
 	if (bp == NULL)
 		return (FALSE);
 	curbp = bp;
@@ -386,6 +388,7 @@ d_updirectory(int f, int n)
 	bp = dired_(fname);
 	if (bp == NULL)
 		return (FALSE);
+	killbuffer(curbp);			
 	curbp = bp;
 	if (showbuffer(bp, curwp, WFFULL) != TRUE)
 		return (FALSE);

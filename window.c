@@ -109,6 +109,9 @@ do_redraw(int f, int n, int force)
 int
 nextwind(int f, int n)
 {
+	// cditzel: prohibit moving to other window if inside buffer list
+	if (strcmp(curbp->b_bname, "*Buffer List*") == 0)
+		return (FALSE);
 	struct mgwin	*wp;
 
 	if ((wp = curwp->w_wndp) == NULL)
@@ -229,48 +232,25 @@ splitwind(int f, int n)
 	wp->w_markline = curwp->w_markline;
 
 	/* figure out which half of the screen we're in */
-	ntru = (curwp->w_ntrows - 1) / 2;	/* Upper size */
-	ntrl = (curwp->w_ntrows - 1) - ntru;	/* Lower size */
+	
+	// cditzel: reshape window layout
+	ntrl = (curwp->w_ntrows - 1) / 4;	/* Upper size */
+	ntru = (curwp->w_ntrows - 1) - ntrl;	/* Lower size */
 
 	for (lp = curwp->w_linep, ntrd = 0; lp != curwp->w_dotp;
 	    lp = lforw(lp))
 		ntrd++;
 
 	lp = curwp->w_linep;
-
-	/* old is upper window */
-	if (ntrd <= ntru) {
-		/* hit mode line */
-		if (ntrd == ntru)
-			lp = lforw(lp);
-		curwp->w_ntrows = ntru;
-		wp->w_wndp = curwp->w_wndp;
-		curwp->w_wndp = wp;
-		wp->w_toprow = curwp->w_toprow + ntru + 1;
-		wp->w_ntrows = ntrl;
-	/* old is lower window */
-	} else {
-		wp1 = NULL;
-		wp2 = wheadp;
-		while (wp2 != curwp) {
-			wp1 = wp2;
-			wp2 = wp2->w_wndp;
-		}
-		if (wp1 == NULL)
-			wheadp = wp;
-		else
-			wp1->w_wndp = wp;
-		wp->w_wndp = curwp;
-		wp->w_toprow = curwp->w_toprow;
-		wp->w_ntrows = ntru;
-
-		/* mode line */
-		++ntru;
-		curwp->w_toprow += ntru;
-		curwp->w_ntrows = ntrl;
-		while (ntru--)
-			lp = lforw(lp);
-	}
+	
+	/* hit mode line */
+	if (ntrd == ntru)
+	    lp = lforw(lp);
+	curwp->w_ntrows = ntru;
+	wp->w_wndp = curwp->w_wndp;
+	curwp->w_wndp = wp;
+	wp->w_toprow = curwp->w_toprow + ntru + 1;
+	wp->w_ntrows = ntrl;
 
 	/* adjust the top lines if necessary */
 	curwp->w_linep = lp;

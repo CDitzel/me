@@ -12,6 +12,7 @@
 #include <sys/queue.h>
 #include <ctype.h>
 #include <signal.h>
+#include <limits.h>
 #include <stdio.h>
 
 #include "def.h"
@@ -536,4 +537,64 @@ joinline(int f, int n)
 	undo_boundary_enable(FFRAND, 1);
 
 	return (TRUE);
+}
+
+/*
+* cditzel: order buffer-list by last visited instead of initial opening
+*/
+void
+orderbufferlist(struct buffer *bp)
+{
+ for (struct buffer *b = bheadp; b != NULL; b = b->b_bufp)
+    {
+       if (b->b_bufp == bp)
+       {
+          b->b_bufp = bp->b_bufp;
+          // bp->b_bufp = bheadp->b_bufp; skip blist buffer?
+          bp->b_bufp = bheadp;
+          bheadp = bp;
+          break;
+        }
+    }
+}
+
+/*
+* cditzel: save list of recent buffers
+*/
+void
+recentf(){
+    ewprintf("Saved list of recent buffers");
+    char filepath[PATH_MAX];
+
+    /* Construct path string to get to this user's home dir */
+    snprintf(filepath, PATH_MAX, "%s/%s", getenv("HOME"), "recentf.md");
+
+    FILE * fptr = fopen(filepath, "w");
+    if (fptr == NULL)
+    {
+        perror("Error opening file for writing recentf list");
+        return;
+    }
+    struct buffer *blp;
+    struct line *lp;
+
+    for (struct buffer *bp = bheadp; bp != NULL; bp = bp->b_bufp) {
+    RSIZE nbytes = 0;
+          if (bp != blp) {
+            lp = bfirstlp(bp);
+            while (lp != bp->b_headp) {
+              nbytes += llength(lp) + 1;
+              lp = lforw(lp);
+            }
+            if (nbytes)
+              nbytes--; /* no bonus newline  */
+          }
+          if (nbytes == 0)
+            continue;
+          if (bp->b_flag & BFREADONLY)
+            continue;
+      // write list of open buffes to file
+          fprintf(fptr, "%s%s \n", bp->b_cwd, bp->b_bname);
+        }
+      fclose(fptr);
 }

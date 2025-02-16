@@ -322,17 +322,16 @@ getindent(const struct line *lp, int *curi)
 	 * we continue
 	 */
 	if (colonp) {
-		*curi += cc_colon_indent;
-		newind -= cc_colon_indent;
+  		*curi += -curbp->b_tabw;
+                newind -= -curbp->b_tabw;
 	}
+	*curi -= (cbrace) * curbp->b_tabw;
+	newind += obrace * curbp->b_tabw;
 
-	*curi -= (cbrace) * cc_basic_indent;
-	newind += obrace * cc_basic_indent;
-
-	if (nparen < 0)
-		newind -= cc_cont_indent;
+        if (nparen < 0)
+     	   newind -= curbp->b_tabw / 2;
 	else if (nparen > 0)
-		newind += cc_cont_indent;
+        	newind += curbp->b_tabw / 2;
 
 	*curi += nicol;
 

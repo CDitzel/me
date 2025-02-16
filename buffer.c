@@ -119,6 +119,9 @@ usebufname(const char *bufp)
 	else if ((bp = bfind(bufp, TRUE)) == NULL)
 		return (FALSE);
 
+	// cditzel: skip dired buffers
+	while (bp->b_flag & BFREADONLY)
+		bp = bp->b_altb;
 	/* and put it in current window */
 	curbp = bp;
 	ret = showbuffer(bp, curwp, WFFRAME | WFFULL);
@@ -341,6 +344,15 @@ listbuffers(int f, int n)
 		initialized = 1;
 	}
 
+	// cditzel: dont show buffer list if there are no buffers
+    	if (curbp->b_bufp == NULL)
+            return FALSE;
+
+	// cditzel: dont invoke buffer list again if already in it
+        if (strcmp(curbp->b_bname, "*Buffer List*") == 0)
+ 	    return (FALSE);
+
+
 	if ((bp = makelist()) == NULL || (wp = popbuf(bp, WNONE)) == NULL)
 		return (FALSE);
 	wp->w_dotp = bp->b_dotp; /* fix up if window already on screen */
@@ -349,6 +361,8 @@ listbuffers(int f, int n)
 	bp->b_modes[1] = name_mode("listbufmap");
 	bp->b_nmodes = 1;
 
+	// cditzel: directly go to opened buffer list window
+	nextwind(f, n);
 	return (TRUE);
 }
 
@@ -375,23 +389,13 @@ makelist(void)
 
 	listbuf_ncol = ncol;		/* cache ncol for listbuf_goto_buffer */
 
-	if (addlinef(blp, "%-*s%s", w, " MR Buffer", "Size   File") == FALSE ||
-	    addlinef(blp, "%-*s%s", w, " -- ------", "----   ----") == FALSE)
-		return (NULL);
-
 	for (bp = bheadp; bp != NULL; bp = bp->b_bufp) {
-		RSIZE nbytes;
-
-		nbytes = 0;			/* Count bytes in buf.	 */
-		if (bp != blp) {
-			lp = bfirstlp(bp);
-			while (lp != bp->b_headp) {
-				nbytes += llength(lp) + 1;
-				lp = lforw(lp);
-			}
-			if (nbytes)
-				nbytes--;	/* no bonus newline	 */
-		}
+	        // cditzel: skip dired and other read-only buffers in the list
+		if (bp->b_flag & BFREADONLY)
+		    continue;
+                // cditzel: skip current buffer to be displayed
+	        if (bp == curbp)
+        	    continue;
 
 		if (addlinef(blp, "%c%c%c %-*.*s%c%-6d %-*s",
 		    (bp == curbp) ? '>' : ' ',	/* current buffer ? */
@@ -401,7 +405,7 @@ makelist(void)
 		    w - 5,		/* four chars already written */
 		    bp->b_bname,	/* buffer name */
 		    strlen(bp->b_bname) < w - 5 ? ' ' : '$', /* truncated? */
-		    nbytes,		/* buffer size */
+		    0,		/* buffer size */
 		    w - 7,		/* seven chars already written */
 		    bp->b_fname) == FALSE)
 			return (NULL);
@@ -460,10 +464,9 @@ listbuf_goto_buffer_helper(int f, int n, int only)
 	curbp = bp;
 	curwp = wp;
 
-	if (only)
-		ret = (onlywind(FFRAND, 1));
-	else
-		ret = TRUE;
+
+	// cditzel: go to selected buffer and make it the only window
+        ret = (onlywind(FFRAND, 1));
 
 cleanup:
 	free(line);
@@ -784,6 +787,8 @@ popbuf(struct buffer *bp, int flags)
 
 	if (showbuffer(bp, wp, WFFULL) != TRUE)
 		return (NULL);
+
+	orderbufferlist(bp);
 	return (wp);
 }
 

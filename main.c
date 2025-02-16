@@ -234,7 +234,8 @@ notnum:
 					/* Ensure enabled, not just toggled */
 					if (init_fcn_name)
 						init_fcn(FFOTHARG, 1);
-					nfiles++;
+				// cditzel: no splits when opening files
+				//	nfiles++;
 				}
 				if (allbro)
 					curbp->b_flag |= BFREADONLY;
