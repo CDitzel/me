@@ -85,8 +85,7 @@ main(int argc, char **argv)
 	if (pledge("stdio rpath wpath cpath fattr chown getpw tty proc exec",
                 NULL) == -1)
 		err(1, "pledge");
-#endif
-
+#endif	
 	while ((o = getopt(argc, argv, "nRb:f:u:")) != -1)
 		switch (o) {
 		case 'b':
@@ -128,9 +127,9 @@ main(int argc, char **argv)
 		exit(1);
 	}
 
+
 	argc -= optind;
 	argv += optind;
-
 	setlocale(LC_CTYPE, "");
 
 	maps_init();		/* Keymaps and modes.		*/
@@ -165,20 +164,43 @@ main(int argc, char **argv)
 	ttykeymapinit();	/* Symbols, bindings.		*/
 	bellinit();		/* Audible and visible bell.	*/
 	dblspace = 1;		/* two spaces for sentence end. */
+	if (argc == 0){
+		char* argv_cwd[1] = {'.'};
+		char* cp = adjustname(argv_cwd, FALSE);
+		if (cp != NULL) {
+			if (fisdir(cp) == TRUE) {
+				(void)do_dired(cp);
+			}
+			if ((curbp = findbuffer(cp)) == NULL) {
+				vttidy();
+				errx(1, "Can't find current buffer!");
+			}
+			(void)showbuffer(curbp, curwp, 0);
+			if (readin(cp) != TRUE)
+				killbuffer(curbp);
+			else {
+				/* Ensure enabled, not just toggled */
+				if (init_fcn_name)
+					init_fcn(FFOTHARG, 1);
+				}
+			if (allbro)
+				curbp->b_flag |= BFREADONLY;	
+		}
+	}
 
 	/*
 	 * doing update() before reading files causes the error messages from
 	 * the file I/O show up on the screen.	(and also an extra display of
 	 * the mode line if there are files specified on the command line.)
 	 */
-	update(CMODE);
+	//update(CMODE);
 
 	/* user startup file. */
 	if (ffp != NULL) {
 		(void)load(ffp, file);
 		ffclose(ffp, NULL);
 	}
-
+	#if 0
 	if (batch) {
 		vttidy();
 		return (0);
@@ -195,13 +217,13 @@ main(int argc, char **argv)
                 	bp->b_modes[i] = defb_modes[i];
         	}
 	}
-
+	#endif
 	/* Force FFOTHARG=1 so that this mode is enabled, not simply toggled */
 	if (init_fcn)
 		init_fcn(FFOTHARG, 1);
-
 	if (nobackups)
 		makebkfile(FFARG, 0);
+
 
 	for (nfiles = 0, i = 0; i < argc; i++) {
 		if (argv[i][0] == '+' && strlen(argv[i]) >= 2) {
@@ -213,8 +235,9 @@ main(int argc, char **argv)
 				goto notnum;
 			startrow = lval;
 		} else {
-notnum:
-			cp = adjustname(argv[i], FALSE);
+notnum:	
+			char* cp = adjustname(argv[i], FALSE);
+			//printf("normalpath %s made with %s", cp, argv[i]);
 			if (cp != NULL) {
 				if (nfiles == 1)
 					splitwind(0, 1);
@@ -281,7 +304,7 @@ static void
 edinit(struct buffer *bp)
 {
 	struct mgwin	*wp;
-
+	
 	bheadp = NULL;
 	bp = bfind("*scratch*", TRUE);		/* Text buffer.          */
 	if (bp == NULL)

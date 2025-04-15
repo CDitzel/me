@@ -550,7 +550,7 @@ orderbufferlist(struct buffer *bp)
        if (b->b_bufp == bp)
        {
           b->b_bufp = bp->b_bufp;
-          // bp->b_bufp = bheadp->b_bufp; skip blist buffer?
+          //bp->b_bufp = bheadp->b_bufp; //skip blist buffer?
           bp->b_bufp = bheadp;
           bheadp = bp;
           break;

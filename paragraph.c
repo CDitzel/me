@@ -59,8 +59,8 @@ gotobop(int f, int n)
 			curwp->w_dotp = lback(curwp->w_dotp);
 		}
 		// cditzel: only go up to last text line and indentation
-        curwp->w_dotp = lforw(curwp->w_dotp);
-        backtoindent(f,n);
+        // curwp->w_dotp = lforw(curwp->w_dotp);
+        // backtoindent(f,n);
 	}
 	/* force screen update */
 	curwp->w_rflag |= WFMOVE;
@@ -118,8 +118,8 @@ do_gotoeop(int f, int n, int *i)
 		return (FALSE);
 	}
      // cditzel: only go down to last text line and indentation
-     curwp->w_dotp = lforw(curwp->w_dotp);
-     backtoindent(f,n);
+     // curwp->w_dotp = lforw(curwp->w_dotp);
+     // backtoindent(f,n);
 
 	/* force screen update */
 	curwp->w_rflag |= WFMOVE;

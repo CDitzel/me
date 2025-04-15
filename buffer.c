@@ -344,14 +344,31 @@ listbuffers(int f, int n)
 		initialized = 1;
 	}
 
+	
+	//int is = is_regular_file(curbp->b_bufp->b_bname);
+	//printf("%s is file? %d", curbp->b_bufp->b_bname, is);
+
 	// cditzel: dont show buffer list if there are no buffers
-    	if (curbp->b_bufp == NULL)
-            return FALSE;
+    if (curbp->b_bufp == NULL)
+        return FALSE;
 
-	// cditzel: dont invoke buffer list again if already in it
-        if (strcmp(curbp->b_bname, "*Buffer List*") == 0)
- 	    return (FALSE);
+	// cditzel: dont invoke buffer list if already inside of it
+    if (strcmp(curbp->b_bname, "*Buffer List*") == 0)
+		return (FALSE);
 
+    //if (strcmp(curbp->b_bufp->b_bname, "*Buffer List*") == 0)
+	//	return (FALSE);
+
+	#if 0
+	if (curbp->b_bufp->b_flag & BFREADONLY)
+		return (FALSE);
+
+    if (strcmp(curbp->b_bufp->b_bname, "*scratch*") == 0)
+		return (FALSE);
+
+	if (!is_regular_file(curbp->b_bufp->b_bname))
+		return (FALSE);
+	#endif		
 
 	if ((bp = makelist()) == NULL || (wp = popbuf(bp, WNONE)) == NULL)
 		return (FALSE);
@@ -364,6 +381,14 @@ listbuffers(int f, int n)
 	// cditzel: directly go to opened buffer list window
 	nextwind(f, n);
 	return (TRUE);
+}
+
+
+int is_regular_file(const char *path)
+{   
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
 }
 
 /*
@@ -390,12 +415,22 @@ makelist(void)
 	listbuf_ncol = ncol;		/* cache ncol for listbuf_goto_buffer */
 
 	for (bp = bheadp; bp != NULL; bp = bp->b_bufp) {
-	        // cditzel: skip dired and other read-only buffers in the list
-		if (bp->b_flag & BFREADONLY)
-		    continue;
-                // cditzel: skip current buffer to be displayed
-	        if (bp == curbp)
-        	    continue;
+	    // cditzel: skip dired and other read-only buffers in the list
+        //if (bp->b_flag & BFREADONLY)
+		// continue
+
+        //if (!is_regular_file(bp->b_bname))
+       	//    continue;
+		
+		if (strcmp(bp->b_bname, "*Buffer List*") == 0)
+			continue;
+		#if 0
+		if (strcmp(bp->b_bname, "*scratch*") == 0)
+       	    continue;
+		#endif
+        // cditzel: skip current buffer to be displayed
+	    if (bp == curbp)
+    	    continue;
 
 		if (addlinef(blp, "%c%c%c %-*.*s%c%-6d %-*s",
 		    (bp == curbp) ? '>' : ' ',	/* current buffer ? */
