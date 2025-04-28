@@ -820,8 +820,10 @@ modeline(struct mgwin *wp, int modelinecolor)
 		vtputc(' ', wp);
 		++n;
 	}
+
 	vtputc(' ', wp);
 	++n;
+    #if 0
 	for (md = 0; ; ) {
 		n += vtputs(bp->b_modes[md]->p_name, wp);
 		if (++md > bp->b_nmodes)
@@ -836,12 +838,9 @@ modeline(struct mgwin *wp, int modelinecolor)
 		n += vtputs("-gwd", wp);
 	vtputc(' ', wp);
 	++n;
-
-	if (linenos && colnos)
-		len = snprintf(sl, sizeof(sl), "%d/%d--C%d", wp->w_dotline, bp->b_lines,
-		    getcolpos(wp));
-	else if (linenos)
-		len = snprintf(sl, sizeof(sl), "%d/%d", wp->w_dotline, bp->b_lines);
+    #endif
+    // cditzel: modify modelines
+	len = snprintf(sl, sizeof(sl), "%d/%d  C%d", wp->w_dotline, bp->b_lines, getcolpos(wp));
 	if ((linenos || colnos) && len < sizeof(sl) && len != -1)
 		n += vtputs(sl, wp);
 

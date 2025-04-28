@@ -432,17 +432,13 @@ makelist(void)
 	    if (bp == curbp)
     	    continue;
 
-		if (addlinef(blp, "%c%c%c %-*.*s%c%-6d %-*s",
+		if (addlinef(blp, "%c%c%c %-*.*s",
 		    (bp == curbp) ? '>' : ' ',	/* current buffer ? */
 		    ((bp->b_flag & BFCHG) != 0) ? '*' : ' ',	/* changed ? */
 		    ((bp->b_flag & BFREADONLY) != 0) ? '*' : ' ',
 		    w - 5,		/* four chars already written */
 		    w - 5,		/* four chars already written */
-		    bp->b_bname,	/* buffer name */
-		    strlen(bp->b_bname) < w - 5 ? ' ' : '$', /* truncated? */
-		    0,		/* buffer size */
-		    w - 7,		/* seven chars already written */
-		    bp->b_fname) == FALSE)
+		    bp->b_bname) == FALSE)
 			return (NULL);
 	}
 	blp->b_dotp = bfirstlp(blp);		/* put dot at beginning of

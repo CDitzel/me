@@ -127,6 +127,7 @@ static struct funmap functnames[] = {
 	{help_help, "help-help", 0},
 	{indent, "indent-current-line", 0},
 	{insert, "insert", 1},
+	{recentf, "recentf", 1, NULL},
 	{bufferinsert, "insert-buffer", 1},
 	{fileinsert, "insert-file", 1},
 	{fillword, "insert-with-wrap", 1},		/* startup only */
@@ -194,6 +195,7 @@ static struct funmap functnames[] = {
 	{pagenext, "scroll-other-window", 1},
 	{forwpage, "scroll-up", 1},
 	{searchagain, "search-again", 0},
+    {searchsymbolatpoint, "search-symbol-at-point", 1, NULL},
 	{backsearch, "search-backward", 0},
 	{forwsearch, "search-forward", 0},
 	{ask_selfinsert, "self-insert-char", 1},

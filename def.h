@@ -609,7 +609,7 @@ int		 evalfile(int, int);
 int		 load(FILE *, const char *);
 int		 excline(char *, int, int);
 char		*skipwhite(char *);
-
+void 		 recentf();
 /* help.c X */
 int		 desckey(int, int);
 int		 wallchart(int, int);
@@ -654,6 +654,7 @@ int		 pipeio(const char * const, char * const[], char * const, int,
 		     struct buffer *);
 
 /* search.c X */
+int      searchsymbolatpoint (int, int);
 int		 forwsearch(int, int);
 int		 backsearch(int, int);
 int		 searchagain(int, int);

@@ -42,6 +42,7 @@ gotobop(int f, int n)
 	while (n-- > 0) {
 		nospace = 0;
 		while (lback(curwp->w_dotp) != curbp->b_headp) {
+            curwp->w_dotp = lback(curwp->w_dotp);
 			curwp->w_doto = 0;
 			col = 0;
 
@@ -56,11 +57,8 @@ gotobop(int f, int n)
 				nospace = 1;
 
 			curwp->w_dotline--;
-			curwp->w_dotp = lback(curwp->w_dotp);
 		}
-		// cditzel: only go up to last text line and indentation
-        // curwp->w_dotp = lforw(curwp->w_dotp);
-        // backtoindent(f,n);
+
 	}
 	/* force screen update */
 	curwp->w_rflag |= WFMOVE;
