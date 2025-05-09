@@ -165,8 +165,8 @@ main(int argc, char **argv)
 	bellinit();		/* Audible and visible bell.	*/
 	dblspace = 1;		/* two spaces for sentence end. */
 	if (argc == 0){
-		char* argv_cwd[1] = {'.'};
-		char* cp = adjustname(argv_cwd, FALSE);
+		char* const argv_cwd[1] = {"."};
+		char* cp = adjustname(*argv_cwd, FALSE);
 		if (cp != NULL) {
 			if (fisdir(cp) == TRUE) {
 				(void)do_dired(cp);

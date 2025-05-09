@@ -573,7 +573,7 @@ int		 backdel(int, int);
 int		 space_to_tabstop(int, int);
 int		 backtoindent(int, int);
 int		 joinline(int, int);
-
+void     orderbufferlist(struct buffer *);
 /* tags.c X */
 int		 findtag(int, int);
 int 		 poptag(int, int);
@@ -608,8 +608,8 @@ int		 evalbuffer(int, int);
 int		 evalfile(int, int);
 int		 load(FILE *, const char *);
 int		 excline(char *, int, int);
-char		*skipwhite(char *);
-void 		 recentf();
+char	 *skipwhite(char *);
+void 	 recentf();
 /* help.c X */
 int		 desckey(int, int);
 int		 wallchart(int, int);

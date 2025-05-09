@@ -127,7 +127,7 @@ static struct funmap functnames[] = {
 	{help_help, "help-help", 0},
 	{indent, "indent-current-line", 0},
 	{insert, "insert", 1},
-	{recentf, "recentf", 1, NULL},
+	//{recentf, "recentf", 1},
 	{bufferinsert, "insert-buffer", 1},
 	{fileinsert, "insert-file", 1},
 	{fillword, "insert-with-wrap", 1},		/* startup only */
